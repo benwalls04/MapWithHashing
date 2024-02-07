@@ -1,4 +1,6 @@
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -196,9 +198,12 @@ public abstract class MapTest {
     @Test
     public final void removeAnySize1() {
         Map<String, String> m = this.createFromArgsTest("1", "red");
-        Map<String, String> mExpected = this.createFromArgsRef();
+        Map<String, String> mExpected = this.createFromArgsRef("1", "red");
 
-        m.removeAny();
+        Map.Pair<String, String> pair = m.removeAny();
+        assertTrue(mExpected.hasKey(pair.key()));
+        assertTrue(mExpected.value(pair.key()).equals(pair.value()));
+        mExpected.remove(pair.key());
 
         assertEquals(m, mExpected);
     }
@@ -210,9 +215,13 @@ public abstract class MapTest {
     public final void removeAnyTest() {
         Map<String, String> m = this.createFromArgsTest("1", "red", "2",
                 "blue");
-        Map<String, String> mExpected = this.createFromArgsRef("2", "blue");
+        Map<String, String> mExpected = this.createFromArgsRef("1", "red", "2",
+                "blue");
 
-        m.removeAny();
+        Map.Pair<String, String> pair = m.removeAny();
+        assertTrue(mExpected.hasKey(pair.key()));
+        assertTrue(mExpected.value(pair.key()).equals(pair.value()));
+        mExpected.remove(pair.key());
 
         assertEquals(m, mExpected);
     }
@@ -225,9 +234,12 @@ public abstract class MapTest {
         Map<String, String> m = this.createFromArgsTest("1", "red", "2", "blue",
                 "3", "green", "4", "yellow", "101", "black");
         Map<String, String> mExpected = this.createFromArgsTest("1", "red", "2",
-                "blue", "3", "green", "4", "yellow");
+                "blue", "3", "green", "4", "yellow", "101", "black");
 
-        m.removeAny();
+        Map.Pair<String, String> pair = m.removeAny();
+        assertTrue(mExpected.hasKey(pair.key()));
+        assertTrue(mExpected.value(pair.key()).equals(pair.value()));
+        mExpected.remove(pair.key());
 
         assertEquals(m, mExpected);
     }
@@ -265,9 +277,9 @@ public abstract class MapTest {
         Map<String, String> m = this.createFromArgsTest("1", "red", "102",
                 "blue");
 
-        String valueExpected = "red";
+        String valueExpected = "blue";
 
-        assertEquals(m.value("1"), valueExpected);
+        assertEquals(m.value("102"), valueExpected);
     }
 
     /**
@@ -275,10 +287,9 @@ public abstract class MapTest {
      */
     @Test
     public final void hasKeyTrueTest() {
-        Map<String, String> m = this.createFromArgsTest("1", "red");
-        boolean expected = true;
-
-        assertEquals(m.hasKey("1"), expected);
+        Map<String, String> m = this.createFromArgsTest("1", "red", "2", "blue",
+                "3", "green");
+        assertTrue(m.hasKey("1"));
     }
 
     /**
@@ -288,9 +299,7 @@ public abstract class MapTest {
     public final void hasKeySameBucket() {
         Map<String, String> m = this.createFromArgsTest("1", "red", "101",
                 "blue");
-        boolean expected = true;
-
-        assertEquals(m.hasKey("101"), expected);
+        assertTrue(m.hasKey("101"));
     }
 
     /**
@@ -300,9 +309,7 @@ public abstract class MapTest {
     public final void hasKeyFirstBucket() {
         Map<String, String> m = this.createFromArgsTest("1", "red", "0",
                 "blue");
-        boolean expected = true;
-
-        assertEquals(m.hasKey("0"), expected);
+        assertTrue(m.hasKey("0"));
     }
 
     /**
@@ -312,9 +319,7 @@ public abstract class MapTest {
     public final void hasKeyLastBucket() {
         Map<String, String> m = this.createFromArgsTest("1", "red", "99",
                 "blue");
-        boolean expected = true;
-
-        assertEquals(m.hasKey("99"), expected);
+        assertTrue(m.hasKey("99"));
     }
 
     /**
@@ -323,9 +328,7 @@ public abstract class MapTest {
     @Test
     public final void hasKeyFalseTest() {
         Map<String, String> m = this.createFromArgsTest("1", "red");
-        boolean expected = false;
-
-        assertEquals(m.hasKey("2"), expected);
+        assertFalse(m.hasKey("2"));
     }
 
     /**
@@ -334,9 +337,7 @@ public abstract class MapTest {
     @Test
     public final void hasKeyEmptyTest() {
         Map<String, String> m = this.createFromArgsTest();
-        boolean expected = false;
-
-        assertEquals(m.hasKey("1"), expected);
+        assertFalse(m.hasKey("1"));
     }
 
     /**
