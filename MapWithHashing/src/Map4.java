@@ -106,7 +106,7 @@ public class Map4<K, V> extends MapSecondary<K, V> {
          * conversion, though it cannot fail.
          */
         this.hashTable = new Map[hashTableSize];
-        for (int i = 0; i < this.hashTable.length; i++) {
+        for (int i = 0; i < hashTableSize; i++) {
             this.hashTable[i] = new Map2<K, V>();
         }
 
@@ -203,12 +203,16 @@ public class Map4<K, V> extends MapSecondary<K, V> {
     public final Pair<K, V> removeAny() {
         assert this.size() > 0 : "Violation of: this /= empty_set";
 
-        int i = 0;
-        while (this.hashTable[i].size() == 0) {
-            i++;
+        boolean bucketFound = false;
+        int index = 0;
+        for (int i = 0; !bucketFound && i < this.hashTable.length; i++) {
+            if (this.hashTable[i].size() > 0) {
+                bucketFound = true;
+                index = i;
+            }
         }
 
-        return this.hashTable[i].removeAny();
+        return this.hashTable[index].removeAny();
     }
 
     @Override
@@ -217,7 +221,6 @@ public class Map4<K, V> extends MapSecondary<K, V> {
         assert this.hasKey(key) : "Violation of: key is in DOMAIN(this)";
 
         int index = mod(key.hashCode(), this.hashTable.length);
-
         return this.hashTable[index].value(key);
     }
 
@@ -226,14 +229,11 @@ public class Map4<K, V> extends MapSecondary<K, V> {
         assert key != null : "Violation of: key is not null";
 
         int index = mod(key.hashCode(), this.hashTable.length);
-
-        return this.hashTable[index] != null
-                && this.hashTable[index].hasKey(key);
+        return this.hashTable[index].hasKey(key);
     }
 
     @Override
     public final int size() {
-
         int size = 0;
         for (int i = 0; i < this.hashTable.length; i++) {
             size += this.hashTable[i].size();
